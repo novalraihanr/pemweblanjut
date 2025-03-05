@@ -1,0 +1,29 @@
+services:
+    db:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: 1234
+            POSTGRES_USER: root
+            POSTGRES_DB: cashier
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    pgadmin:
+        image: dpage/pgadmin4
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: novalrr21@gmail.com
+            PGADMIN_DEFAULT_PASSWORD: Noval1150?
+        ports:
+            - "5050:80"
+        depends_on:
+            - db
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+    postgres_data:
+    pgadmin_data:
