@@ -9,7 +9,7 @@ class Customers extends Model
 {
     protected $table = 'customers';
 
-    protected $primaryKey = 'customers_id';
+    protected $primaryKey = 'customer_id';
 
     protected $fillable = ['name', 'is_member'];
 

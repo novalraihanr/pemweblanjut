@@ -45,7 +45,7 @@ class ItemsController extends Controller
             $item = Items::findOrFail($id);
             $request->validate([
                 'item_name' => 'required',
-                'quantity' => 'required',
+                'stock' => 'required',
                 'price' => 'required',
             ]);
             $item->update($request->all());

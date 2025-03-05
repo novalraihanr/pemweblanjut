@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customers;
+use App\Models\Items;
 use App\Models\Transactions;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class TransactionsController extends Controller
 {
@@ -16,18 +18,39 @@ class TransactionsController extends Controller
         return response()->json($transactions);
     }
 
-    public function show_transaction($id)
+    public function show($id)
     {
         try {
             $customer = Customers::findOrFail($id);
 
-            $transactions = $customer->transactions()->whereDate('created_at', Carbon::today());
-            $total = $customer->transactions()->whereDate('created_at', Carbon::today())->sum('total');
+            $transactions = Transactions::whereDate('created_at', Carbon::today())->get();
+            $total = $customer->items()->whereDate('transactions.created_at', Carbon::today())->sum('total');
 
             return response()->json(['transactions' => $transactions, 'total' => $total]);
 
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Transaction not found'], 404);
+        }
+    }
+
+    public function store(Request $request, $id)
+    {
+        try {
+            $customer = Customers::findOrFail($id);
+
+            $request->validate([
+                'item_id' => 'required',
+                'quantity' => 'required',
+            ]);
+
+            $item = Items::findOrFail($request->input('item_id'));
+            $total = (float) $item->price * (float) $request->input('quantity');
+
+            $customer->items()->attach($request->input('item_id'), ['quantity' => $request->input('quantity'), 'total' => $total]);
+
+            return response()->json('Item Added Successfull');
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Customer not found'], 404);
         }
     }
 
